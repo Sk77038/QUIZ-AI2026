@@ -32,6 +32,7 @@ export const NAV_ITEMS = [
   { id: View.QUIZ, label: 'Quiz', icon: <BookOpen size={22} /> },
   { id: View.SOLVE, label: 'Guru AI', icon: <Brain size={22} /> },
   { id: View.CAMERA, label: 'Scanner', icon: <Camera size={22} /> },
+  { id: View.CALCULATOR, label: 'Calc', icon: <Calculator size={22} /> },
   { id: View.PROFILE, label: 'Me', icon: <User size={22} /> },
 ];
 

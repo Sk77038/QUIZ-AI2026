@@ -10,7 +10,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Star,
-  Home
+  Home,
+  Calculator
 } from 'lucide-react';
 import { UserProfile, View } from '../types';
 
@@ -36,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, isOpen, onClose, onNavig
   const menuItems: MenuItem[] = [
     { id: View.HOME, label: 'Home Dashboard', icon: <Home className="text-blue-500" size={20} /> },
     { id: View.LEADERBOARD, label: 'Leaderboard', icon: <Trophy className="text-amber-500" size={20} />, badge: 'Global' },
+    { id: View.CALCULATOR, label: 'Calculator', icon: <Calculator className="text-emerald-500" size={20} /> },
     { id: View.PROFILE, label: 'My Profile', icon: <Brain className="text-indigo-500" size={20} /> },
     { id: View.SETTINGS, label: 'Settings', icon: <Settings className="text-gray-500" size={20} /> },
     { id: View.PRIVACY, label: 'Privacy Policy', icon: <HelpCircle className="text-teal-500" size={20} /> },
