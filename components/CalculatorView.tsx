@@ -9,43 +9,35 @@ export const CalculatorView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   const handleInput = (val: string) => {
     if (display === '0' && !isNaN(Number(val))) setDisplay(val);
     else if (display === 'Error') setDisplay(val);
-    else setDisplay(prev => prev + val);
+    else if (display.length < 15) setDisplay(prev => prev + val);
   };
 
-  /**
-   * Safe Arithmetic Evaluator
-   * This avoids eval() and new Function() to pass Vercel's security checks.
-   */
   const safeEval = (str: string): number => {
-    // Basic regex to split numbers and operators
-    const tokens = str.split(/([+\-×÷])/).map(t => t.trim());
-    if (tokens.length === 0) return 0;
-
-    let result = parseFloat(tokens[0]);
-    for (let i = 1; i < tokens.length; i += 2) {
-      const op = tokens[i];
-      const val = parseFloat(tokens[i + 1]);
-      if (op === '+') result += val;
-      if (op === '-') result -= val;
-      if (op === '×') result *= val;
-      if (op === '÷') result /= val;
-    }
-    return result;
+    try {
+      const tokens = str.split(/([+\-×÷])/).map(t => t.trim());
+      if (tokens.length === 0) return 0;
+      let result = parseFloat(tokens[0]);
+      for (let i = 1; i < tokens.length; i += 2) {
+        const op = tokens[i];
+        const val = parseFloat(tokens[i + 1]);
+        if (op === '+') result += val;
+        if (op === '-') result -= val;
+        if (op === '×') result *= val;
+        if (op === '÷') result /= val;
+      }
+      return result;
+    } catch { return NaN; }
   };
 
   const calculate = () => {
-    try {
-      const res = safeEval(display);
-      if (isNaN(res) || !isFinite(res)) throw new Error();
-      
-      setHistory(prev => [`${display} = ${res}`, ...prev].slice(0, 5));
-      setDisplay(String(res));
-    } catch (e) {
+    const res = safeEval(display);
+    if (isNaN(res) || !isFinite(res)) {
       setDisplay('Error');
+    } else {
+      setHistory(prev => [`${display} = ${res}`, ...prev].slice(0, 3));
+      setDisplay(String(Number(res.toFixed(8))));
     }
   };
-
-  const clear = () => setDisplay('0');
 
   const buttons = [
     'C', '÷', '×', 'DEL',
@@ -56,40 +48,42 @@ export const CalculatorView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="p-4 bg-white border-b flex items-center gap-4">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full"><ArrowLeft size={24} /></button>
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <CalcIcon size={24} className="text-blue-600" /> Master Calculator
+    <div className="h-full bg-white flex flex-col animate-pop overflow-hidden">
+      <header className="p-4 bg-white border-b flex items-center gap-4 shrink-0">
+        <button onClick={onBack} className="p-3 hover:bg-gray-100 rounded-2xl active:scale-90 transition-all">
+          <ArrowLeft size={24} className="text-gray-900" />
+        </button>
+        <h1 className="text-xl font-black flex items-center gap-2">
+          <CalcIcon size={24} className="text-blue-600" /> Calculator
         </h1>
       </header>
 
-      <div className="flex-1 p-4 flex flex-col">
-        <div className="mb-4 h-24 overflow-y-auto bg-gray-100 p-2 rounded-lg text-sm text-gray-500">
-          {history.length === 0 ? "No history yet" : history.map((h, i) => <div key={i}>{h}</div>)}
+      <div className="flex-1 flex flex-col p-6 overflow-hidden">
+        <div className="mb-4 h-16 bg-gray-50 p-4 rounded-2xl text-xs text-gray-400 font-bold overflow-hidden flex flex-col justify-end">
+          {history.map((h, i) => <div key={i} className="animate-fade-in">{h}</div>)}
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-inner mb-6 text-right text-4xl font-mono truncate border-2 border-blue-100">
+        <div className="bg-white p-8 rounded-[2.5rem] border-2 border-blue-50 shadow-inner mb-6 text-right text-4xl font-black font-mono truncate text-gray-900">
           {display}
         </div>
 
-        <div className="grid grid-cols-4 gap-3 flex-1">
+        <div className="grid grid-cols-4 gap-3 flex-1 pb-8">
           {buttons.map((btn, i) => (
             <button
               key={i}
               onClick={() => {
                 if (btn === '=') calculate();
-                else if (btn === 'C') clear();
+                else if (btn === 'C') setDisplay('0');
                 else if (btn === 'DEL') setDisplay(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
                 else if (btn !== '') handleInput(btn);
               }}
-              className={`h-16 rounded-xl text-xl font-bold transition-all active:scale-95 ${
+              className={`h-full min-h-[64px] rounded-[1.5rem] text-xl font-black transition-all active:scale-90 flex items-center justify-center ${
                 ['÷', '×', '-', '+', '='].includes(btn) 
-                ? 'bg-blue-600 text-white' 
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' 
                 : btn === 'C' || btn === 'DEL' 
-                ? 'bg-red-100 text-red-600'
-                : 'bg-white text-gray-800 shadow-sm border'
-              } ${btn === '' ? 'opacity-0 cursor-default' : ''}`}
+                ? 'bg-red-50 text-red-600'
+                : 'bg-gray-50 text-gray-800'
+              } ${btn === '' ? 'opacity-0' : ''}`}
             >
               {btn}
             </button>

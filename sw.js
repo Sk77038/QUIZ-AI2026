@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'master-sahab-pwa-v5';
+const CACHE_NAME = 'master-sahab-pwa-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -37,20 +37,17 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Use a Cache-First strategy for static assets, Network-First for others
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
       
       return fetch(event.request).then((networkResponse) => {
-        // Cache new GET requests dynamically
         if (event.request.method === 'GET' && networkResponse.status === 200) {
           const cacheCopy = networkResponse.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, cacheCopy));
         }
         return networkResponse;
       }).catch(() => {
-        // Fallback for navigation requests
         if (event.request.mode === 'navigate') {
           return caches.match('/index.html');
         }
