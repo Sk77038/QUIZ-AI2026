@@ -1,0 +1,7 @@
+{
+  "name": "Master Sahab AI",
+  "description": "Premium AI Study Companion for Indian Students with Offline Quizzes and OCR Solver.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
